@@ -15,10 +15,18 @@
  */
 package com.google.android.gms.samples.vision.ocrreader;
 
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.RectF;
+import android.view.View;
+import android.view.Display;
+import android.view.Window;
+import android.view.WindowManager;
+import android.content.Context;
+import android.util.DisplayMetrics;
 
 import com.google.android.gms.samples.vision.ocrreader.ui.camera.GraphicOverlay;
 import com.google.android.gms.vision.text.Text;
@@ -103,20 +111,27 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
             return;
         }
 
-        // Draws the bounding box around the TextBlock.
-        RectF rect = new RectF(text.getBoundingBox());
-        rect.left = translateX(rect.left);
-        rect.top = translateY(rect.top);
-        rect.right = translateX(rect.right);
-        rect.bottom = translateY(rect.bottom);
+        DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
+        int width = metrics.widthPixels;
+        int height = metrics.heightPixels;
+
+        RectF rect = new RectF(0, 0, width, height);
         canvas.drawRect(rect, sRectPaint);
 
-        // Break the text into multiple lines and draw each one according to its own bounding box.
-        List<? extends Text> textComponents = text.getComponents();
-        for(Text currentText : textComponents) {
-            float left = translateX(currentText.getBoundingBox().left);
-            float bottom = translateY(currentText.getBoundingBox().bottom);
-            canvas.drawText(currentText.getValue(), left, bottom, sTextPaint);
-        }
+//        // Draws the bounding box around the TextBlock.
+//        rect = new RectF(text.getBoundingBox());
+//        rect.left = translateX(rect.left);
+//        rect.top = translateY(rect.top);
+//        rect.right = translateX(rect.right);
+//        rect.bottom = translateY(rect.bottom);
+//        canvas.drawRect(rect, sRectPaint);
+//
+//        // Break the text into multiple lines and draw each one according to its own bounding box.
+//        List<? extends Text> textComponents = text.getComponents();
+//        for(Text currentText : textComponents) {
+//            float left = translateX(currentText.getBoundingBox().left);
+//            float bottom = translateY(currentText.getBoundingBox().bottom);
+//            canvas.drawText(currentText.getValue(), left, bottom, sTextPaint);
+//        }
     }
 }

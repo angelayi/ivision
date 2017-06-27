@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
 
@@ -68,6 +69,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     }
                 };
         tts = new TextToSpeech(this.getApplicationContext(), listener);
+
     }
 
     @Override

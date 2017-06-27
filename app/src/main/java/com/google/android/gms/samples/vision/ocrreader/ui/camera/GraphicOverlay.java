@@ -167,11 +167,17 @@ public class GraphicOverlay<T extends GraphicOverlay.Graphic> extends View {
             // Get the position of this View so the raw location can be offset relative to the view.
             int[] location = new int[2];
             this.getLocationOnScreen(location);
+
             for (T graphic : mGraphics) {
-                if (graphic.contains(rawX - location[0], rawY - location[1])) {
-                    return graphic;
-                }
+                return graphic;
             }
+
+
+//            for (T graphic : mGraphics) {
+//                if (graphic.contains(rawX - location[0], rawY - location[1])) {
+//                    return graphic;
+//                }
+//            }
             return null;
         }
     }

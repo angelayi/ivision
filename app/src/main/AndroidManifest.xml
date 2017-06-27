@@ -30,7 +30,7 @@
         </activity>
 
         <activity android:name="com.google.android.gms.samples.vision.ocrreader.OcrCaptureActivity"
-            android:label="Read Text" />
+            android:label="Capture Text" />
     </application>
 
 </manifest>
