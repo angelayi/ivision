@@ -80,6 +80,8 @@ public final class OcrCaptureActivity extends AppCompatActivity {
     private ScaleGestureDetector scaleGestureDetector;
     private GestureDetector gestureDetector;
 
+    private TextToSpeech tts;
+
     /**
      * Initializes the UI and creates the detector pipeline.
      */
@@ -112,6 +114,20 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         Snackbar.make(mGraphicOverlay, "Tap to capture. Pinch/Stretch to zoom",
                 Snackbar.LENGTH_LONG)
                 .show();
+
+        TextToSpeech.OnInitListener listener =
+                new TextToSpeech.OnInitListener() {
+                    @Override
+                    public void onInit(final int status) {
+                        if (status == TextToSpeech.SUCCESS) {
+                            Log.d("TTS", "Text to speech engine started successfully.");
+                            tts.setLanguage(Locale.US);
+                        } else {
+                            Log.d("TTS", "Error starting the text to speech engine.");
+                        }
+                    }
+                };
+        tts = new TextToSpeech(this.getApplicationContext(), listener);
     }
 
     //Handles the requesting of the camera permission
@@ -162,6 +178,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         TextRecognizer textRecognizer = new TextRecognizer.Builder(context).build();
         textRecognizer.setProcessor(new OcrDetectorProcessor(mGraphicOverlay));
 
+        // Check if textRecognizer is operational
         if (!textRecognizer.isOperational()) {
             // GMS will download a native library to the device to do detection
             Log.w(TAG, "Detector dependencies are not yet available.");
@@ -296,6 +313,8 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                 Intent data = new Intent();
                 data.putExtra(TextBlockObject, text.getValue());
                 setResult(CommonStatusCodes.SUCCESS, data);
+                Log.d(TAG, "text data is being spoken! " + text.getValue());
+                tts.speak(text.getValue(), TextToSpeech.QUEUE_ADD, null);
                 finish();
             }
             else {

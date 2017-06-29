@@ -41,7 +41,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private static final int RC_OCR_CAPTURE = 9003;
     private static final String TAG = "MainActivity";
 
-    private TextToSpeech tts;
+    //private TextToSpeech tts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,19 +56,19 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         findViewById(R.id.read_text).setOnClickListener(this);
 
-        TextToSpeech.OnInitListener listener =
-                new TextToSpeech.OnInitListener() {
-                    @Override
-                    public void onInit(final int status) {
-                        if (status == TextToSpeech.SUCCESS) {
-                            Log.d("OnInitListener", "Text to speech engine started successfully.");
-                            tts.setLanguage(Locale.US);
-                        } else {
-                            Log.d("OnInitListener", "Error starting the text to speech engine.");
-                        }
-                    }
-                };
-        tts = new TextToSpeech(this.getApplicationContext(), listener);
+//        TextToSpeech.OnInitListener listener =
+//                new TextToSpeech.OnInitListener() {
+//                    @Override
+//                    public void onInit(final int status) {
+//                        if (status == TextToSpeech.SUCCESS) {
+//                            Log.d("OnInitListener", "Text to speech engine started successfully.");
+//                            tts.setLanguage(Locale.US);
+//                        } else {
+//                            Log.d("OnInitListener", "Error starting the text to speech engine.");
+//                        }
+//                    }
+//                };
+//        tts = new TextToSpeech(this.getApplicationContext(), listener);
 
     }
 
@@ -106,7 +106,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     statusMessage.setText(R.string.ocr_success);
                     textValue.setText(text);
                     Log.d(TAG, "Text read: " + text);
-                    tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+                    //tts.speak(text, TextToSpeech.QUEUE_ADD, null);
                 } else {
                     statusMessage.setText(R.string.ocr_failure);
                     Log.d(TAG, "No Text captured, intent data is null");

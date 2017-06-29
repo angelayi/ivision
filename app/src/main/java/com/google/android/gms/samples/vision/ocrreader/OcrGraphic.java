@@ -117,6 +117,14 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
 
         RectF rect = new RectF(0, 0, width, height);
         canvas.drawRect(rect, sRectPaint);
+        List<? extends Text> textComponents = text.getComponents();
+        for(Text currentText : textComponents) {
+            float left = translateX(currentText.getBoundingBox().left);
+            float bottom = translateY(currentText.getBoundingBox().bottom);
+            canvas.drawText(currentText.getValue(), left, bottom, sTextPaint);
+        }
+
+
 
 //        // Draws the bounding box around the TextBlock.
 //        rect = new RectF(text.getBoundingBox());
