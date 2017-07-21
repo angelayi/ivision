@@ -26,20 +26,28 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -48,10 +56,13 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.samples.vision.ocrreader.ui.camera.CameraSource;
 import com.google.android.gms.samples.vision.ocrreader.ui.camera.CameraSourcePreview;
 import com.google.android.gms.samples.vision.ocrreader.ui.camera.GraphicOverlay;
+import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import java.io.IOException;
 import java.util.Locale;
+
+import static android.R.attr.data;
 
 /**
  * Activity for the multi-tracker app.  This app detects text and displays the value with the
@@ -81,6 +92,10 @@ public final class OcrCaptureActivity extends AppCompatActivity {
     private GestureDetector gestureDetector;
 
     private TextToSpeech tts;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+    private Bitmap mImageBitmap;
+    private String mCurrentPhotoPath;
+    private ImageView mImageView;
 
     /**
      * Initializes the UI and creates the detector pipeline.
@@ -128,6 +143,32 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                     }
                 };
         tts = new TextToSpeech(this.getApplicationContext(), listener);
+
+
+
+//        OcrGraphic graphic = mGraphicOverlay.getGraphicAtLocation(rawX, rawY);
+//        TextBlock text = null;
+//        Log.d(TAG, "Text recognized: " + text.getValue());
+//        if (graphic != null) {
+//            text = graphic.getTextBlock();
+//            Log.d(TAG, "text data is being spoken! " + text.getValue());
+//            if (text != null && text.getValue() != null) {
+//                Intent data = new Intent();
+//                data.putExtra(TextBlockObject, text.getValue());
+//                setResult(CommonStatusCodes.SUCCESS, data);
+//                Log.d(TAG, "text data is being spoken! " + text.getValue());
+//                tts.speak(text.getValue(), TextToSpeech.QUEUE_ADD, null);
+//                finish();
+//            }
+//            else {
+//                Log.d(TAG, "text data is null");
+//            }
+//        }
+//        else {
+//            Log.d(TAG,"no text detected");
+//        }
+
+        Log.d(TAG, "done");
     }
 
     //Handles the requesting of the camera permission
@@ -305,16 +346,45 @@ public final class OcrCaptureActivity extends AppCompatActivity {
 
     // Captures the first TextBlock under the tap location and return to Initializing Activity
     private boolean onTap(float rawX, float rawY) {
+
+        /*
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        try {
+            mImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(mCurrentPhotoPath));
+            mImageView.setImageBitmap(mImageBitmap);
+        } catch (IOException e) {
+        }
+
+        TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
+
+        Frame imageFrame = new Frame.Builder()
+                .setBitmap(mImageBitmap)
+                .build();
+
+        SparseArray<TextBlock> textBlocks = textRecognizer.detect(imageFrame);
+
+        for (int i = 0; i < textBlocks.size(); i++) {
+            TextBlock textBlock = textBlocks.get(textBlocks.keyAt(i));
+
+            Log.d(TAG, "Text found: " + textBlock.getValue());
+            tts.speak(textBlock.getValue(), TextToSpeech.QUEUE_ADD, null);
+            // Do something with value
+        }
+        */
+
+
         OcrGraphic graphic = mGraphicOverlay.getGraphicAtLocation(rawX, rawY);
         TextBlock text = null;
         if (graphic != null) {
             text = graphic.getTextBlock();
+            Log.d(TAG, "Graphic.getTextBlock() " + graphic.toString());
             if (text != null && text.getValue() != null) {
                 Intent data = new Intent();
                 data.putExtra(TextBlockObject, text.getValue());
                 setResult(CommonStatusCodes.SUCCESS, data);
+
                 Log.d(TAG, "text data is being spoken! " + text.getValue());
-                tts.speak(text.getValue(), TextToSpeech.QUEUE_ADD, null);
+                //tts.speak(text.getValue(), TextToSpeech.QUEUE_ADD, null);
                 finish();
             }
             else {

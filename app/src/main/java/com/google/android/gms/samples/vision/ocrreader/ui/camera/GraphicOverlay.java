@@ -173,11 +173,11 @@ public class GraphicOverlay<T extends GraphicOverlay.Graphic> extends View {
             }
 
 
-//            for (T graphic : mGraphics) {
-//                if (graphic.contains(rawX - location[0], rawY - location[1])) {
-//                    return graphic;
-//                }
-//            }
+            for (T graphic : mGraphics) {
+                if (graphic.contains(rawX - location[0], rawY - location[1])) {
+                    return graphic;
+                }
+            }
             return null;
         }
     }

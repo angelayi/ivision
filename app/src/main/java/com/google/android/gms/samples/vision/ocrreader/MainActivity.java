@@ -16,21 +16,35 @@
 
 package com.google.android.gms.samples.vision.ocrreader;
 
+import android.annotation.TargetApi;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
+import android.os.Environment;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
+import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.vision.text.TextBlock;
 
 import java.util.Locale;
 
-public class MainActivity extends Activity implements View.OnClickListener {
+import static android.R.attr.data;
+
+public class MainActivity extends Activity implements View.OnClickListener, GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
 
     // Use a compound button so either checkbox or switch widgets work.
     private CompoundButton autoFocus;
@@ -41,7 +55,17 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private static final int RC_OCR_CAPTURE = 9003;
     private static final String TAG = "MainActivity";
 
-    //private TextToSpeech tts;
+    private static final String DEBUG_TAG = "Gestures";
+    private GestureDetectorCompat mDetector;
+
+    private String text;
+
+    private TextToSpeech tts;
+    private int mStatus = 0;
+    private MediaPlayer mMediaPlayer;
+    private boolean mProcessed = false;
+    private final String FILENAME = "/wpta_tts.wav";
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,19 +80,22 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         findViewById(R.id.read_text).setOnClickListener(this);
 
-//        TextToSpeech.OnInitListener listener =
-//                new TextToSpeech.OnInitListener() {
-//                    @Override
-//                    public void onInit(final int status) {
-//                        if (status == TextToSpeech.SUCCESS) {
-//                            Log.d("OnInitListener", "Text to speech engine started successfully.");
-//                            tts.setLanguage(Locale.US);
-//                        } else {
-//                            Log.d("OnInitListener", "Error starting the text to speech engine.");
-//                        }
-//                    }
-//                };
-//        tts = new TextToSpeech(this.getApplicationContext(), listener);
+        mDetector = new GestureDetectorCompat(this,this);
+        mDetector.setOnDoubleTapListener(this);
+
+        TextToSpeech.OnInitListener listener =
+                new TextToSpeech.OnInitListener() {
+                    @Override
+                    public void onInit(final int status) {
+                        if (status == TextToSpeech.SUCCESS) {
+                            Log.d("OnInitListener", "Text to speech engine started successfully.");
+                            tts.setLanguage(Locale.US);
+                        } else {
+                            Log.d("OnInitListener", "Error starting the text to speech engine.");
+                        }
+                    }
+                };
+        tts = new TextToSpeech(this.getApplicationContext(), listener);
 
     }
 
@@ -102,11 +129,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
         if(requestCode == RC_OCR_CAPTURE) {
             if (resultCode == CommonStatusCodes.SUCCESS) {
                 if (data != null) {
-                    String text = data.getStringExtra(OcrCaptureActivity.TextBlockObject);
+                    text = data.getStringExtra(OcrCaptureActivity.TextBlockObject);
                     statusMessage.setText(R.string.ocr_success);
                     textValue.setText(text);
                     Log.d(TAG, "Text read: " + text);
-                    //tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+
+                    tts.speak(text, TextToSpeech.QUEUE_ADD, null);
                 } else {
                     statusMessage.setText(R.string.ocr_failure);
                     Log.d(TAG, "No Text captured, intent data is null");
@@ -120,4 +148,157 @@ public class MainActivity extends Activity implements View.OnClickListener {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+        this.mDetector.onTouchEvent(event);
+        // Be sure to call the superclass implementation
+        return super.onTouchEvent(event);
+    }
+
+    @Override
+    public boolean onSingleTapConfirmed(MotionEvent event) {
+        Log.d(DEBUG_TAG, "onSingleTapConfirmed: " + event.toString());
+        tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+        return true;
+    }
+
+    public boolean onDoubleTap(MotionEvent event) {
+        Log.d(DEBUG_TAG, "onDoubleTap: " + event.toString());
+        tts.stop();
+        return true;
+    }
+
+    public boolean onDoubleTapEvent(MotionEvent event) {
+        Log.d(DEBUG_TAG, "onDoubleTapEvent: " + event.toString());
+        return true;
+    }
+
+    @Override
+    public boolean onDown(MotionEvent motionEvent) {
+        return false;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent motionEvent) {
+
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent motionEvent) {
+        return false;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+        return false;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent motionEvent) {
+
+    }
+
+    @Override
+    public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+        return false;
+    }
+
+    /*
+    @SuppressWarnings("deprecation")
+    @TargetApi(15)
+    public void setTts(TextToSpeech tts) {
+        this.tts = tts;
+
+        if(Build.VERSION.SDK_INT  >= 15 ){
+            this.tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                @Override
+                public void onDone(String utteranceId){
+                    // Speech file is created
+                    mProcessed = true;
+
+                    // Initializes Media Player
+                    initializeMediaPlayer();
+
+                    // Start Playing Speech
+                    playMediaPlayer(0);
+                }
+
+                @Override
+                public void onError(String utteranceId){
+                }
+
+                @Override
+                public void onStart(String utteranceId){
+                }
+            });
+        }else{
+            this.tts.setOnUtteranceCompletedListener(new TextToSpeech.OnUtteranceCompletedListener() {
+                @Override
+                public void onUtteranceCompleted(String utteranceId) {
+                    // Speech file is created
+                    mProcessed = true;
+
+                    // Initializes Media Player
+                    initializeMediaPlayer();
+
+                    // Start Playing Speech
+                    playMediaPlayer(0);
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        // Stop the TextToSpeech Engine
+        tts.stop();
+
+        // Shutdown the TextToSpeech Engine
+        tts.shutdown();
+
+        // Stop the MediaPlayer
+        mMediaPlayer.stop();
+
+        // Release the MediaPlayer
+        mMediaPlayer.release();
+
+        super.onDestroy();
+    }
+
+    public void onInit(int status) {
+        mStatus = status;
+        setTts(tts);
+    }
+
+    private void initializeMediaPlayer(){
+        String fileName = Environment.getExternalStorageDirectory().getAbsolutePath() + FILENAME;
+
+        Uri uri  = Uri.parse("file://"+fileName);
+
+        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        try {
+            mMediaPlayer.setDataSource(getApplicationContext(), uri);
+            mMediaPlayer.prepare();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void playMediaPlayer(int status){
+        mProgressDialog.dismiss();
+
+        // Start Playing
+        if(status==0){
+            mMediaPlayer.start();
+        }
+
+        // Pause Playing
+        if(status==1){
+            mMediaPlayer.pause();
+        }
+    }
+    */
 }
