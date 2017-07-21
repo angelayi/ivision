@@ -29,6 +29,7 @@ import android.os.Environment;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -44,7 +45,7 @@ import java.util.Locale;
 
 import static android.R.attr.data;
 
-public class MainActivity extends Activity implements View.OnClickListener, GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
+public class MainActivity extends AppCompatActivity implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
 
     // Use a compound button so either checkbox or switch widgets work.
     private CompoundButton autoFocus;
@@ -78,7 +79,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Gest
         autoFocus = (CompoundButton) findViewById(R.id.auto_focus);
         useFlash = (CompoundButton) findViewById(R.id.use_flash);
 
-        findViewById(R.id.read_text).setOnClickListener(this);
+        //findViewById(R.id.read_text).setOnClickListener(this);
 
         mDetector = new GestureDetectorCompat(this,this);
         mDetector.setOnDoubleTapListener(this);
@@ -99,6 +100,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Gest
 
     }
 
+    /*
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.read_text) {
@@ -110,6 +112,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Gest
             startActivityForResult(intent, RC_OCR_CAPTURE);
         }
     }
+    */
 
     /*
      * @param requestCode The integer request code originally supplied to
@@ -174,6 +177,18 @@ public class MainActivity extends Activity implements View.OnClickListener, Gest
         return true;
     }
 
+    public boolean onFling(MotionEvent event1, MotionEvent event2, float v, float v1) {
+        if(event1.getX() < event2.getX()) {
+            Log.d(DEBUG_TAG, "onFling");
+            Intent intent = new Intent(this, OcrCaptureActivity.class);
+            intent.putExtra(OcrCaptureActivity.AutoFocus, autoFocus.isChecked());
+            intent.putExtra(OcrCaptureActivity.UseFlash, useFlash.isChecked());
+
+            startActivityForResult(intent, RC_OCR_CAPTURE);
+        }
+        return true;
+    }
+
     @Override
     public boolean onDown(MotionEvent motionEvent) {
         return false;
@@ -197,11 +212,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Gest
     @Override
     public void onLongPress(MotionEvent motionEvent) {
 
-    }
-
-    @Override
-    public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-        return false;
     }
 
     /*
