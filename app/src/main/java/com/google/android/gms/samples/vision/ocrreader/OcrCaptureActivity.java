@@ -45,9 +45,12 @@ import android.util.SparseArray;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -56,13 +59,17 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.samples.vision.ocrreader.ui.camera.CameraSource;
 import com.google.android.gms.samples.vision.ocrreader.ui.camera.CameraSourcePreview;
 import com.google.android.gms.samples.vision.ocrreader.ui.camera.GraphicOverlay;
+import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
+
 import java.io.IOException;
 import java.util.Locale;
 
 import static android.R.attr.data;
+import static android.R.attr.text;
 
 /**
  * Activity for the multi-tracker app.  This app detects text and displays the value with the
@@ -91,11 +98,19 @@ public final class OcrCaptureActivity extends AppCompatActivity {
     private ScaleGestureDetector scaleGestureDetector;
     private GestureDetector gestureDetector;
 
-    private TextToSpeech tts;
+    //private TextToSpeech tts;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     private Bitmap mImageBitmap;
     private String mCurrentPhotoPath;
     private ImageView mImageView;
+
+    private SurfaceView cameraView;
+    private TextView textView;
+    private CameraSource cameraSource;
+    private TextRecognizer textRecognizer;
+
+    private String text;
+
 
     /**
      * Initializes the UI and creates the detector pipeline.
@@ -107,12 +122,18 @@ public final class OcrCaptureActivity extends AppCompatActivity {
 
         mPreview = (CameraSourcePreview) findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay<OcrGraphic>) findViewById(R.id.graphicOverlay);
+        cameraView = (SurfaceView) findViewById(R.id.surfaceView);
+        textView = (TextView) findViewById(R.id.textView);
 
         Intent intent = getIntent();
 
         // read parameters from the intent used to launch the activity.
         boolean autoFocus = getIntent().getBooleanExtra(AutoFocus, false);
         boolean useFlash = getIntent().getBooleanExtra(UseFlash, false);
+
+        // create Text Recognizer
+        textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
+
 
         // Check for the camera permission before accessing the camera.  If the
         // permission is not granted yet, request permission.
@@ -130,45 +151,34 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                 Snackbar.LENGTH_LONG)
                 .show();
 
-        TextToSpeech.OnInitListener listener =
-                new TextToSpeech.OnInitListener() {
-                    @Override
-                    public void onInit(final int status) {
-                        if (status == TextToSpeech.SUCCESS) {
-                            Log.d("TTS", "Text to speech engine started successfully.");
-                            tts.setLanguage(Locale.US);
-                        } else {
-                            Log.d("TTS", "Error starting the text to speech engine.");
+        textRecognizer.setProcessor(new Detector.Processor<TextBlock>() {
+            @Override
+            public void release() {
+
+            }
+
+            @Override
+            public void receiveDetections(Detector.Detections<TextBlock> detections) {
+
+                final SparseArray<TextBlock> items = detections.getDetectedItems();
+                if (items.size() != 0) {
+                    textView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            StringBuilder stringBuilder = new StringBuilder();
+                            for (int i = 0; i < items.size(); ++i) {
+                                TextBlock item = items.valueAt(i);
+                                stringBuilder.append(item.getValue());
+                                stringBuilder.append("\n");
+                            }
+                            text = stringBuilder.toString();
+                            Log.d(TAG, "Text Recognized: " + text);
                         }
-                    }
-                };
-        tts = new TextToSpeech(this.getApplicationContext(), listener);
+                    });
+                }
+            }
+        });
 
-
-
-//        OcrGraphic graphic = mGraphicOverlay.getGraphicAtLocation(rawX, rawY);
-//        TextBlock text = null;
-//        Log.d(TAG, "Text recognized: " + text.getValue());
-//        if (graphic != null) {
-//            text = graphic.getTextBlock();
-//            Log.d(TAG, "text data is being spoken! " + text.getValue());
-//            if (text != null && text.getValue() != null) {
-//                Intent data = new Intent();
-//                data.putExtra(TextBlockObject, text.getValue());
-//                setResult(CommonStatusCodes.SUCCESS, data);
-//                Log.d(TAG, "text data is being spoken! " + text.getValue());
-//                tts.speak(text.getValue(), TextToSpeech.QUEUE_ADD, null);
-//                finish();
-//            }
-//            else {
-//                Log.d(TAG, "text data is null");
-//            }
-//        }
-//        else {
-//            Log.d(TAG,"no text detected");
-//        }
-
-        Log.d(TAG, "done");
     }
 
     //Handles the requesting of the camera permission
@@ -213,12 +223,6 @@ public final class OcrCaptureActivity extends AppCompatActivity {
     private void createCameraSource(boolean autoFocus, boolean useFlash) {
         Context context = getApplicationContext();
 
-        // A text recognizer is created to find text.  An associated processor instance
-        // is set to receive the text recognition results and display graphics for each text block
-        // on screen.
-        TextRecognizer textRecognizer = new TextRecognizer.Builder(context).build();
-        textRecognizer.setProcessor(new OcrDetectorProcessor(mGraphicOverlay));
-
         // Check if textRecognizer is operational
         if (!textRecognizer.isOperational()) {
             // GMS will download a native library to the device to do detection
@@ -238,12 +242,12 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         // Creates and starts the camera.
         mCameraSource =
                 new CameraSource.Builder(getApplicationContext(), textRecognizer)
-                .setFacing(CameraSource.CAMERA_FACING_BACK)
-                .setRequestedPreviewSize(1280, 1024)
-                .setRequestedFps(2.0f)
-                .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
-                .setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null)
-                .build();
+                        .setFacing(CameraSource.CAMERA_FACING_BACK)
+                        .setRequestedPreviewSize(1280, 1024)
+                        .setRequestedFps(2.0f)
+                        .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
+                        .setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null)
+                        .build();
     }
 
     // Restarts the camera
@@ -288,9 +292,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
      * @see #requestPermissions(String[], int)
      */
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode != RC_HANDLE_CAMERA_PERM) {
             Log.d(TAG, "Got unexpected permission result: " + requestCode);
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -344,63 +346,15 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         }
     }
 
-    // Captures the first TextBlock under the tap location and return to Initializing Activity
-    private boolean onTap(float rawX, float rawY) {
-
-        /*
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        try {
-            mImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse(mCurrentPhotoPath));
-            mImageView.setImageBitmap(mImageBitmap);
-        } catch (IOException e) {
-        }
-
-        TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
-
-        Frame imageFrame = new Frame.Builder()
-                .setBitmap(mImageBitmap)
-                .build();
-
-        SparseArray<TextBlock> textBlocks = textRecognizer.detect(imageFrame);
-
-        for (int i = 0; i < textBlocks.size(); i++) {
-            TextBlock textBlock = textBlocks.get(textBlocks.keyAt(i));
-
-            Log.d(TAG, "Text found: " + textBlock.getValue());
-            tts.speak(textBlock.getValue(), TextToSpeech.QUEUE_ADD, null);
-            // Do something with value
-        }
-        */
-
-
-        OcrGraphic graphic = mGraphicOverlay.getGraphicAtLocation(rawX, rawY);
-        TextBlock text = null;
-        if (graphic != null) {
-            text = graphic.getTextBlock();
-            Log.d(TAG, "Graphic.getTextBlock() " + graphic.toString());
-            if (text != null && text.getValue() != null) {
-                Intent data = new Intent();
-                data.putExtra(TextBlockObject, text.getValue());
-                setResult(CommonStatusCodes.SUCCESS, data);
-
-                Log.d(TAG, "text data is being spoken! " + text.getValue());
-                //tts.speak(text.getValue(), TextToSpeech.QUEUE_ADD, null);
-                finish();
-            }
-            else {
-                Log.d(TAG, "text data is null");
-            }
-        }
-        else {
-            Log.d(TAG,"no text detected");
-        }
-        return text != null;
-    }
-
     private class CaptureGestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            return onTap(e.getRawX(), e.getRawY()) || super.onSingleTapConfirmed(e);
+            Log.d(TAG, "onSingleTapConfirmed: ");
+            Intent data = new Intent();
+            data.putExtra(TextBlockObject, text);
+            setResult(CommonStatusCodes.SUCCESS, data);
+            finish();
+            return true;
         }
     }
 

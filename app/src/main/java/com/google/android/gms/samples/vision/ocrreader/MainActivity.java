@@ -62,11 +62,6 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     private String text;
 
     private TextToSpeech tts;
-    private int mStatus = 0;
-    private MediaPlayer mMediaPlayer;
-    private boolean mProcessed = false;
-    private final String FILENAME = "/wpta_tts.wav";
-    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,8 +138,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                     Log.d(TAG, "No Text captured, intent data is null");
                 }
             } else {
-                statusMessage.setText(String.format(getString(R.string.ocr_error),
-                        CommonStatusCodes.getStatusCodeString(resultCode)));
+                statusMessage.setText(String.format(getString(R.string.ocr_error), CommonStatusCodes.getStatusCodeString(resultCode)));
             }
         }
         else {
@@ -195,9 +189,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     }
 
     @Override
-    public void onShowPress(MotionEvent motionEvent) {
-
-    }
+    public void onShowPress(MotionEvent motionEvent) { return; }
 
     @Override
     public boolean onSingleTapUp(MotionEvent motionEvent) {
@@ -205,14 +197,10 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     }
 
     @Override
-    public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-        return false;
-    }
+    public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) { return false; }
 
     @Override
-    public void onLongPress(MotionEvent motionEvent) {
-
-    }
+    public void onLongPress(MotionEvent motionEvent) { return; }
 
     /*
     @SuppressWarnings("deprecation")

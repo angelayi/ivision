@@ -12,10 +12,24 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.google.android.gms.samples.vision.ocrreader.ui.camera.GraphicOverlay
-            android:id="@+id/graphicOverlay"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+    <com.google.android.gms.samples.vision.ocrreader.ui.camera.GraphicOverlay
+        android:id="@+id/graphicOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <SurfaceView
+        android:id="@+id/surfaceView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:text="No Text"
+        android:layout_alignParentBottom="true"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     </com.google.android.gms.samples.vision.ocrreader.ui.camera.CameraSourcePreview>
 
