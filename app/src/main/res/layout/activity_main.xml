@@ -55,4 +55,36 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
+    <TextView
+        android:id="@+id/translatableText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="Hi, Translate Me!"
+        android:textSize="25sp" />
+
+
+    <EditText
+        android:id="@+id/translatedText"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="21dp"
+        android:background="@android:color/white"
+        android:hint="English - Tagalog"
+        android:padding="5dp"
+        android:layout_below="@+id/status_message"
+        android:layout_alignLeft="@+id/translatebutton"
+        android:layout_alignStart="@+id/translatebutton" />
+
+    <Button
+        android:id="@+id/translatebutton"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_below="@+id/translatedTtext"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:textStyle="bold"
+        android:text="Translate" />
+
 </RelativeLayout>

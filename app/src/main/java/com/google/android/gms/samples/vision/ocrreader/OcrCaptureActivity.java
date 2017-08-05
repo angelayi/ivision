@@ -17,7 +17,6 @@ package com.google.android.gms.samples.vision.ocrreader;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -26,30 +25,18 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.hardware.Camera;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,8 +47,6 @@ import com.google.android.gms.samples.vision.ocrreader.ui.camera.CameraSource;
 import com.google.android.gms.samples.vision.ocrreader.ui.camera.CameraSourcePreview;
 import com.google.android.gms.samples.vision.ocrreader.ui.camera.GraphicOverlay;
 import com.google.android.gms.vision.Detector;
-import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 
@@ -73,8 +58,7 @@ import static android.R.attr.text;
 
 /**
  * Activity for the multi-tracker app.  This app detects text and displays the value with the
- * rear facing camera. During detection overlay graphics are drawn to indicate the position,
- * size, and contents of each TextBlock.
+ * rear facing camera.
  */
 public final class OcrCaptureActivity extends AppCompatActivity {
     private static final String TAG = "OcrCaptureActivity";
@@ -98,23 +82,11 @@ public final class OcrCaptureActivity extends AppCompatActivity {
     private ScaleGestureDetector scaleGestureDetector;
     private GestureDetector gestureDetector;
 
-    //private TextToSpeech tts;
-    static final int REQUEST_IMAGE_CAPTURE = 1;
-    private Bitmap mImageBitmap;
-    private String mCurrentPhotoPath;
-    private ImageView mImageView;
-
-    private SurfaceView cameraView;
     private TextView textView;
-    private CameraSource cameraSource;
     private TextRecognizer textRecognizer;
-
     private String text;
 
-
-    /**
-     * Initializes the UI and creates the detector pipeline.
-     */
+    // Initializes UI creates detector
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
@@ -122,21 +94,17 @@ public final class OcrCaptureActivity extends AppCompatActivity {
 
         mPreview = (CameraSourcePreview) findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay<OcrGraphic>) findViewById(R.id.graphicOverlay);
-        cameraView = (SurfaceView) findViewById(R.id.surfaceView);
         textView = (TextView) findViewById(R.id.textView);
 
-        Intent intent = getIntent();
-
-        // read parameters from the intent used to launch the activity.
+        // Read parameters from the intent used to launch the activity.
         boolean autoFocus = getIntent().getBooleanExtra(AutoFocus, false);
         boolean useFlash = getIntent().getBooleanExtra(UseFlash, false);
 
-        // create Text Recognizer
+        // Create Text Recognizer
         textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
 
-
-        // Check for the camera permission before accessing the camera.  If the
-        // permission is not granted yet, request permission.
+        // Check for the camera permission before accessing the camera.
+        // If the permission is not granted yet, request permission.
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (rc == PackageManager.PERMISSION_GRANTED) {
             createCameraSource(autoFocus, useFlash);
@@ -151,22 +119,18 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                 Snackbar.LENGTH_LONG)
                 .show();
 
+        // Processor which receives detected TextBlocks
         textRecognizer.setProcessor(new Detector.Processor<TextBlock>() {
-            @Override
-            public void release() {
-
-            }
 
             @Override
             public void receiveDetections(Detector.Detections<TextBlock> detections) {
-
                 final SparseArray<TextBlock> items = detections.getDetectedItems();
                 if (items.size() != 0) {
                     textView.post(new Runnable() {
                         @Override
                         public void run() {
                             StringBuilder stringBuilder = new StringBuilder();
-                            for (int i = 0; i < items.size(); ++i) {
+                            for (int i = 0; i < items.size(); i++) {
                                 TextBlock item = items.valueAt(i);
                                 stringBuilder.append(item.getValue());
                                 stringBuilder.append("\n");
@@ -177,6 +141,10 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                     });
                 }
             }
+
+            // Frees the resources associated with this detection processor.
+            @Override
+            public void release() {}
         });
 
     }
@@ -209,19 +177,9 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                 .show();
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent e) {
-        boolean b = scaleGestureDetector.onTouchEvent(e);
-
-        boolean c = gestureDetector.onTouchEvent(e);
-
-        return b || c || super.onTouchEvent(e);
-    }
-
     // Creates and starts the camera
     @SuppressLint("InlinedApi")
     private void createCameraSource(boolean autoFocus, boolean useFlash) {
-        Context context = getApplicationContext();
 
         // Check if textRecognizer is operational
         if (!textRecognizer.isOperational()) {
@@ -346,14 +304,25 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent e) {
+        boolean b = scaleGestureDetector.onTouchEvent(e);
+
+        boolean c = gestureDetector.onTouchEvent(e);
+
+        return b || c || super.onTouchEvent(e);
+    }
+
     private class CaptureGestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            Log.d(TAG, "onSingleTapConfirmed: ");
+            Log.d(TAG, "onSingleTapConfirmed");
+
             Intent data = new Intent();
             data.putExtra(TextBlockObject, text);
             setResult(CommonStatusCodes.SUCCESS, data);
             finish();
+
             return true;
         }
     }
