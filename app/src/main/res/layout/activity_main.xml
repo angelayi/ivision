@@ -8,83 +8,67 @@
     tools:context="com.google.android.gms.samples.vision.ocrreader.MainActivity">
 
     <TextView
+        android:id="@+id/status_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/ocr_header"
-        android:id="@+id/status_message"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_centerHorizontal="true" />
+        android:textAlignment="center"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_alignParentTop="true"/>
 
     <TextView
+        android:id="@+id/text_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/text_value"
-        android:layout_marginTop="168dp"
         android:layout_below="@+id/status_message"
+        android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <!--<Button-->
-        <!--android:id="@+id/read_text"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="@string/read_text"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_centerHorizontal="true" />-->
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/language_arrays"
+        android:prompt="@string/language_prompt"
+        android:layout_below="@+id/text_value"/>
+
+    <Button
+        android:id="@+id/translatebutton"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:textStyle="bold"
+        android:text="Translate"
+        android:layout_below="@+id/spinner" />
+
+    <TextView
+        android:id="@+id/outputText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/translatebutton" />
 
     <CheckBox
+        android:id="@+id/auto_focus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/auto_focus"
-        android:id="@+id/auto_focus"
         android:checked="true"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
     <CheckBox
+        android:id="@+id/use_flash"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/use_flash"
-        android:id="@+id/use_flash"
         android:checked="false"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
-
-    <TextView
-        android:id="@+id/translatableText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:text="Hi, Translate Me!"
-        android:textSize="25sp" />
-
-
-    <EditText
-        android:id="@+id/translatedText"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginTop="21dp"
-        android:background="@android:color/white"
-        android:hint="English - Tagalog"
-        android:padding="5dp"
-        android:layout_below="@+id/status_message"
-        android:layout_alignLeft="@+id/translatebutton"
-        android:layout_alignStart="@+id/translatebutton" />
-
-    <Button
-        android:id="@+id/translatebutton"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_below="@+id/translatedTtext"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="20dp"
-        android:textStyle="bold"
-        android:text="Translate" />
 
 </RelativeLayout>
