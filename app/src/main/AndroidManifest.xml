@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.google.android.gms.samples.vision.ocrreader"
+    package="com.ivision.android.gms.vision.ocrreader"
     android:installLocation="auto" >
 
     <uses-feature android:name="android.hardware.camera" />
@@ -21,7 +21,7 @@
             android:value="ocr" />
 
         <activity
-            android:name="com.google.android.gms.samples.vision.ocrreader.MainActivity"
+            android:name="com.ivision.android.gms.vision.ocrreader.MainActivity"
             android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,7 +30,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.google.android.gms.samples.vision.ocrreader.OcrCaptureActivity"
+        <activity android:name="com.ivision.android.gms.vision.ocrreader.OcrCaptureActivity"
             android:label="Capture Text" />
     </application>
 
