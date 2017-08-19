@@ -5,7 +5,7 @@ android {
     buildToolsVersion '25.0.0'
 
     defaultConfig {
-        applicationId "com.google.android.gms.samples.vision.ocrreader"
+        applicationId "com.ivision.android.gms.vision.ocrreader"
         minSdkVersion 9
         targetSdkVersion 23
         versionCode 1
