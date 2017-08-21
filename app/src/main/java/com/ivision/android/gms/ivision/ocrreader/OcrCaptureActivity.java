@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ivision.android.gms.vision.ocrreader;
+package com.ivision.android.gms.ivision.ocrreader;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -44,9 +44,9 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.CommonStatusCodes;
-import com.ivision.android.gms.vision.ocrreader.ui.camera.CameraSource;
-import com.ivision.android.gms.vision.ocrreader.ui.camera.CameraSourcePreview;
-import com.ivision.android.gms.vision.ocrreader.ui.camera.GraphicOverlay;
+import com.ivision.android.gms.ivision.ocrreader.ui.camera.CameraSource;
+import com.ivision.android.gms.ivision.ocrreader.ui.camera.CameraSourcePreview;
+import com.ivision.android.gms.ivision.ocrreader.ui.camera.GraphicOverlay;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;

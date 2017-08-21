@@ -1,4 +1,4 @@
-package com.ivision.android.gms.vision.ocrreader;
+package com.ivision.android.gms.ivision.ocrreader;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

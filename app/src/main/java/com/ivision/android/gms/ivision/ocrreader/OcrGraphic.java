@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ivision.android.gms.vision.ocrreader;
+package com.ivision.android.gms.ivision.ocrreader;
 
 import android.content.Intent;
 import android.content.res.Resources;
@@ -32,7 +32,7 @@ import android.content.Context;
 import android.util.DisplayMetrics;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
-import com.ivision.android.gms.vision.ocrreader.ui.camera.GraphicOverlay;
+import com.ivision.android.gms.ivision.ocrreader.ui.camera.GraphicOverlay;
 import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 

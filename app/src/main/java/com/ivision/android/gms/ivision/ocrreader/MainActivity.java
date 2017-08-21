@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ivision.android.gms.vision.ocrreader;
+package com.ivision.android.gms.ivision.ocrreader;
 
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
