@@ -18,6 +18,9 @@ package com.ivision.android.gms.ivision.ocrreader;
 
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
+import android.content.ClipboardManager;
+import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
@@ -267,8 +270,13 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
 
                     textValue.setText(text);
                     tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+                    tts.speak("Text has been saved to clipboard.", TextToSpeech.QUEUE_ADD, null);
                     tts.speak("Click drop-down menu to translate text into other languages.", TextToSpeech.QUEUE_ADD, null);
                     tts.speak("Swipe right to capture new text.", TextToSpeech.QUEUE_ADD, null);
+
+                    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    clipboard.setText(text);
+
                 } else {
                     statusMessage.setText(R.string.ocr_failure);
                     Log.d(TAG, "No Text captured, intent data is null");
