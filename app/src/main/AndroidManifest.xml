@@ -32,6 +32,9 @@
 
         <activity android:name="com.ivision.android.gms.ivision.ocrreader.OcrCaptureActivity"
             android:label="Capture Text" />
+
+        <activity android:name="com.ivision.android.gms.ivision.ocrreader.TTSEnginesActivity"
+            android:label="List TTS Engines"/>
     </application>
 
 </manifest>

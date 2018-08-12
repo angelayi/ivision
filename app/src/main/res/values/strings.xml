@@ -94,4 +94,13 @@
         <item>Xhosa</item>
         <item>Zulu</item>
     </string-array>
+
+    <string name="tts_prompt">Choose a TTS Engine</string>
+
+    <string name="pref_sync">pref_sync</string>
+    <string name="pref_sync_summ">pref_sync_summ</string>
+    <string name="pref_syncConnectionType">pref_syncConnectionType</string>
+    <string name="pref_syncConnectionTypes_entries">pref_syncConnectionTypes_entries</string>
+    <string name="pref_syncConnectionTypes_values">pref_syncConnectionTypes_values</string>
+    <string name="pref_syncConnectionTypes_default">pref_syncConnectionTypes_default</string>
 </resources>

@@ -19,6 +19,7 @@ package com.ivision.android.gms.ivision.ocrreader;
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -54,16 +55,15 @@ import java.util.Locale;
 
 import static android.R.attr.data;
 
+@TargetApi(14)
 public class MainActivity extends AppCompatActivity implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener, AdapterView.OnItemSelectedListener {
-    private static final String API_KEY = "AIzaSyCjQak6ANqeI-b6bBNJV9m55jYaYN4Bh_w";
+    private static final String API_KEY = "";
 
     // Use a compound button so either checkbox or switch widgets work.
     private CompoundButton autoFocus;
     private CompoundButton useFlash;
     private TextView statusMessage;
     private TextView textValue;
-
-    private Spinner spinner;
 
     private static final int RC_OCR_CAPTURE = 9003;
     private static final String TAG = "MainActivity";
@@ -80,6 +80,10 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     private TextView outputText;
     private String languageSelected;
     private HashMap<Integer, String> languages;
+    Spinner spLanguage;
+
+    public static final int RC_TTSENGINES = 1003;
+    private String ttsEngineName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,12 +96,12 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         autoFocus = (CompoundButton) findViewById(R.id.auto_focus);
         useFlash = (CompoundButton) findViewById(R.id.use_flash);
 
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        spLanguage = (Spinner) findViewById(R.id.spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.language_arrays, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(this);
+        spLanguage.setAdapter(adapter);
+        spLanguage.setOnItemSelectedListener(this);
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -113,11 +117,6 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         });
 
 
-        //findViewById(R.id.read_text).setOnClickListener(this);
-
-        mDetector = new GestureDetectorCompat(this,this);
-        mDetector.setOnDoubleTapListener(this);
-
         TextToSpeech.OnInitListener listener =
                 new TextToSpeech.OnInitListener() {
                     @Override
@@ -131,7 +130,15 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                         }
                     }
                 };
+//        tts = new TextToSpeech(this.getApplicationContext(), listener, ttsEngineName);
         tts = new TextToSpeech(this.getApplicationContext(), listener);
+
+        //findViewById(R.id.read_text).setOnClickListener(this);
+
+        mDetector = new GestureDetectorCompat(this,this);
+        mDetector.setOnDoubleTapListener(this);
+
+
 
         languages = new HashMap<Integer, String>();
         languages = createHash(languages);
@@ -270,167 +277,36 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+
+        if (requestCode == RC_TTSENGINES) {
+            if (resultCode == CommonStatusCodes.SUCCESS) {
+                if (data != null) {
+                    ttsEngineName = data.getStringExtra(TTSEnginesActivity.TTSSelectedString);
+                    Log.d("TTSListener", "EngineName: " + ttsEngineName.toString());
+
+
+                    TextToSpeech.OnInitListener listener =
+                            new TextToSpeech.OnInitListener() {
+                                @Override
+                                public void onInit(final int status) {
+                                    if (status == TextToSpeech.SUCCESS) {
+                                        Log.d("OnInitListener", "Text to speech engine started successfully.");
+                                        tts.setLanguage(Locale.US);
+                                        tts.speak("Swipe right to detect text, double tap to stop speech, tap to restart speech", TextToSpeech.QUEUE_ADD, null);
+                                    } else {
+                                        Log.d("OnInitListener", "Error starting the text to speech engine.");
+                                    }
+                                }
+                            };
+                    tts = new TextToSpeech(this.getApplicationContext(), listener, ttsEngineName);
+                    Log.d("TTSListener", "tts: " + tts);
+                }
+            }
+        }
     }
 
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         languageSelected = languages.get(position);
-//        switch(position) {
-//            case 0: languageSelected = "af";
-//                break;
-//            case 1: languageSelected = "sq";
-//                break;
-//            case 2: languageSelected = "am";
-//                break;
-//            case 3: languageSelected = "ar";
-//                break;
-//            case 4: languageSelected = "hy";
-//                break;
-//            case 5: languageSelected = "az";
-//                break;
-//            case 6: languageSelected = "eu";
-//                break;
-//            case 7: languageSelected = "bn";
-//                break;
-//            case 8: languageSelected = "bs";
-//                break;
-//            case 9: languageSelected = "bg";
-//                break;
-//            case 10: languageSelected = "ca";
-//                break;
-//            case 11: languageSelected = "ceb";
-//                break;
-//            case 12: languageSelected = "zh-CN";
-//                break;
-//            case 13: languageSelected = "zh-TW";
-//                break;
-//            case 14: languageSelected = "co";
-//                break;
-//            case 15: languageSelected = "hr";
-//                break;
-//            case 16: languageSelected = "cs";
-//                break;
-//            case 17: languageSelected = "da";
-//                break;
-//            case 18: languageSelected = "nl";
-//                break;
-//            case 19: languageSelected = "et";
-//                break;
-//            case 20: languageSelected = "fi";
-//                break;
-//            case 21: languageSelected = "fr";
-//                break;
-//            case 22: languageSelected = "gl";
-//                break;
-//            case 23: languageSelected = "ka";
-//                break;
-//            case 24: languageSelected = "de";
-//                break;
-//            case 25: languageSelected = "el";
-//                break;
-//            case 26: languageSelected = "gu";
-//                break;
-//            case 27: languageSelected = "iw";
-//                break;
-//            case 28: languageSelected = "hi";
-//                break;
-//            case 29: languageSelected = "hu";
-//                break;
-//            case 30: languageSelected = "is";
-//                break;
-//            case 31: languageSelected = "id";
-//                break;
-//            case 32: languageSelected = "it";
-//                break;
-//            case 33: languageSelected = "ja";
-//                break;
-//            case 34: languageSelected = "jw";
-//                break;
-//            case 35: languageSelected = "kn";
-//                break;
-//            case 36: languageSelected = "kk";
-//                break;
-//            case 37: languageSelected = "km";
-//                break;
-//            case 38: languageSelected = "ko";
-//                break;
-//            case 39: languageSelected = "ku";
-//                break;
-//            case 40: languageSelected = "lv";
-//                break;
-//            case 41: languageSelected = "lt";
-//                break;
-//            case 42: languageSelected = "mk";
-//                break;
-//            case 43: languageSelected = "ms";
-//                break;
-//            case 44: languageSelected = "ml";
-//                break;
-//            case 45: languageSelected = "mr";
-//                break;
-//            case 46: languageSelected = "mn";
-//                break;
-//            case 47: languageSelected = "no";
-//                break;
-//            case 48: languageSelected = "ny";
-//                break;
-//            case 49: languageSelected = "ps";
-//                break;
-//            case 50: languageSelected = "fa";
-//                break;
-//            case 51: languageSelected = "pl";
-//                break;
-//            case 52: languageSelected = "pt";
-//                break;
-//            case 53: languageSelected = "ma";
-//                break;
-//            case 54: languageSelected = "ro";
-//                break;
-//            case 55: languageSelected = "ru";
-//                break;
-//            case 56: languageSelected = "sr";
-//                break;
-//            case 57: languageSelected = "st";
-//                break;
-//            case 58: languageSelected = "sn";
-//                break;
-//            case 59: languageSelected = "sd";
-//                break;
-//            case 60: languageSelected = "si";
-//                break;
-//            case 61: languageSelected = "sk";
-//                break;
-//            case 62: languageSelected = "sl";
-//                break;
-//            case 63: languageSelected = "es";
-//                break;
-//            case 64: languageSelected = "sw";
-//                break;
-//            case 65: languageSelected = "sv";
-//                break;
-//            case 66: languageSelected = "tl";
-//                break;
-//            case 67: languageSelected = "ta";
-//                break;
-//            case 68: languageSelected = "te";
-//                break;
-//            case 69: languageSelected = "th";
-//                break;
-//            case 70: languageSelected = "tr";
-//                break;
-//            case 71: languageSelected = "uk";
-//                break;
-//            case 72: languageSelected = "ur";
-//                break;
-//            case 73: languageSelected = "uz";
-//                break;
-//            case 74: languageSelected = "vi";
-//                break;
-//            case 75: languageSelected = "xh";
-//                break;
-//            case 76: languageSelected = "zu";
-//                break;
-//            default: break;
-//        }
     }
 
     public void onNothingSelected(AdapterView<?> parent) {}
@@ -517,6 +393,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     public boolean onFling(MotionEvent event1, MotionEvent event2, float v, float v1) {
         if(event1.getX() < event2.getX()) {
             Log.d(DEBUG_TAG, "swipe right");
+
             Intent intent = new Intent(this, OcrCaptureActivity.class);
             intent.putExtra(OcrCaptureActivity.AutoFocus, autoFocus.isChecked());
             intent.putExtra(OcrCaptureActivity.UseFlash, useFlash.isChecked());
@@ -528,6 +405,13 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
             startActivityForResult(intent, RC_OCR_CAPTURE);
         } else if(event1.getX() > event2.getX()) {
             Log.d(DEBUG_TAG, "swipe left");
+
+            Intent intent = new Intent(this, TTSEnginesActivity.class);
+
+            ttsEngineName = "";
+
+            startActivityForResult(intent, RC_TTSENGINES);
+//            startActivity(intent);
         }
         return true;
     }
