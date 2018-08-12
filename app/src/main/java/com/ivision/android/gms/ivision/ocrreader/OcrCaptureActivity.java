@@ -17,6 +17,7 @@ package com.ivision.android.gms.ivision.ocrreader;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -61,6 +62,7 @@ import static android.R.attr.text;
  * Activity for the multi-tracker app.  This app detects text and displays the value with the
  * rear facing camera.
  */
+@TargetApi(14)
 public final class OcrCaptureActivity extends AppCompatActivity {
     private static final String TAG = "OcrCaptureActivity";
 
@@ -88,6 +90,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
     private String text;
 
     private TextToSpeech tts;
+    private String ttsEngineName;
 
     // Initializes UI creates detector
     @Override
@@ -118,24 +121,31 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         gestureDetector = new GestureDetector(this, new CaptureGestureListener());
         scaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener());
 
-        Snackbar.make(mGraphicOverlay, "Tap to capture. Pinch/Stretch to zoom",
+        Snackbar.make(mGraphicOverlay, "Tap to capture. Pinch/Stretch to zoom.",
                 Snackbar.LENGTH_LONG)
                 .show();
 
-        TextToSpeech.OnInitListener listener =
-                new TextToSpeech.OnInitListener() {
-                    @Override
-                    public void onInit(final int status) {
-                        if (status == TextToSpeech.SUCCESS) {
-                            Log.d("OnInitListener", "Text to speech engine started successfully.");
-                            tts.setLanguage(Locale.US);
-                            tts.speak("Tap to capture. Pinch/Stretch to zoom", TextToSpeech.QUEUE_ADD, null);
-                        } else {
-                            Log.d("OnInitListener", "Error starting the text to speech engine.");
-                        }
-                    }
-                };
-        tts = new TextToSpeech(this.getApplicationContext(), listener);
+        tts = new TextToSpeech(this.getApplicationContext(), new TextToSpeech.OnInitListener() {
+            public void onInit(int status) {
+                tts.setLanguage(Locale.US);
+                tts.speak("Tap to capture. Pinch/Stretch to zoom.", TextToSpeech.QUEUE_ADD, null);
+            }
+        }, ttsEngineName);
+
+//        TextToSpeech.OnInitListener listener =
+//                new TextToSpeech.OnInitListener() {
+//                    @Override
+//                    public void onInit(final int status) {
+//                        if (status == TextToSpeech.SUCCESS) {
+//                            Log.d("OnInitListener", "Text to speech engine started successfully.");
+//                            tts.setLanguage(Locale.US);
+//                            tts.speak("Tap to capture. Pinch/Stretch to zoom", TextToSpeech.QUEUE_ADD, null);
+//                        } else {
+//                            Log.d("OnInitListener", "Error starting the text to speech engine.");
+//                        }
+//                    }
+//                };
+//        tts = new TextToSpeech(this.getApplicationContext(), listener);
 
 
 

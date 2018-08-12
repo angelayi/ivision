@@ -37,6 +37,7 @@ public class TTSEnginesActivity extends AppCompatActivity implements OnInitListe
     private String defaultTTS;
     private int ttsSelected;
     private String selectedTTS;
+    private String selectedTTSLabel;
 
     private static final String DEBUG_TAG = "Gestures";
     private GestureDetectorCompat mDetector;
@@ -47,7 +48,6 @@ public class TTSEnginesActivity extends AppCompatActivity implements OnInitListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tts_engines);
-        tvDefaultTTS = (TextView)findViewById(R.id.defaultTTS);
 
         tts = new TextToSpeech(this, this);
         listInstalledEngines = tts.getEngines();
@@ -64,10 +64,6 @@ public class TTSEnginesActivity extends AppCompatActivity implements OnInitListe
                 this, android.R.layout.simple_spinner_item, listInstalledEnginesName);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spInstalledEngines.setAdapter(adapter);
-//        spInstalledEngines.setOnItemSelectedListener(this);
-
-        defaultTTS = tts.getDefaultEngine();
-        tvDefaultTTS.setText("Default TTS Engine: " + defaultTTS);
 
         mDetector = new GestureDetectorCompat(this,this);
         mDetector.setOnDoubleTapListener(this);
@@ -101,17 +97,20 @@ public class TTSEnginesActivity extends AppCompatActivity implements OnInitListe
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-//        tts.setEngineByPackageName(listInstalledEnginesName.get(position));
-//        Log.d(TAG, "tts selected: " + listInstalledEnginesName.get(position));
-//        Log.d(TAG, "tts set: " + tts.getDefaultEngine());
+        tts.stop();
 
-        Log.d(TAG, "tts selected: " + listInstalledEnginesName.get(position));
-        selectedTTS = listInstalledEnginesName.get(position);
+        Log.d(TAG, "tts selected: " + listInstalledEngines.get(position).name);
+        selectedTTS = listInstalledEngines.get(position).name;
+        selectedTTSLabel = listInstalledEngines.get(position).label;
 
-//        Intent data = new Intent();
-//        data.putExtra(TTSSelectedString, listInstalledEnginesName.get(position));
-//        setResult(CommonStatusCodes.SUCCESS, data);
-//        finish();
+        tts = new TextToSpeech(this.getApplicationContext(), new TextToSpeech.OnInitListener() {
+            public void onInit(int status) {
+                tts.setLanguage(Locale.US);
+                tts.speak("Currently " + selectedTTSLabel + " selected.", TextToSpeech.QUEUE_ADD, null);
+                tts.speak("Click drop-down menu to change Text to Speech Engine.", TextToSpeech.QUEUE_ADD, null);
+                tts.speak("Press OK to confirm your selection or go back to main page.", TextToSpeech.QUEUE_ADD, null);
+            }
+        }, selectedTTS);
 
     }
 

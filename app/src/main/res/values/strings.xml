@@ -5,7 +5,7 @@
     <string name="no_camera_permission">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
     <string name="low_storage_error">Ocr dependencies cannot be downloaded due to low device storage</string>
     <string name="title_activity_main">iVision OCR Reader</string>
-    <string name="ocr_header">Swipe right to detect text, double tap to stop speech, tap to restart speech</string>
+    <string name="ocr_header">Swipe right to detect text, double tap to stop speech, tap to restart speech. Swipe left to select Text to Speech Engine.</string>
     <string name="read_text">Detect Text</string>
     <string name="repeat_text">Repeat Text</string>
     <string name="auto_focus">Auto Focus</string>
@@ -102,5 +102,4 @@
     <string name="pref_syncConnectionType">pref_syncConnectionType</string>
     <string name="pref_syncConnectionTypes_entries">pref_syncConnectionTypes_entries</string>
     <string name="pref_syncConnectionTypes_values">pref_syncConnectionTypes_values</string>
-    <string name="pref_syncConnectionTypes_default">pref_syncConnectionTypes_default</string>
 </resources>

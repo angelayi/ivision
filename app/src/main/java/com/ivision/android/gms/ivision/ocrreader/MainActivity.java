@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                         if (status == TextToSpeech.SUCCESS) {
                             Log.d("OnInitListener", "Text to speech engine started successfully.");
                             tts.setLanguage(Locale.US);
-                            tts.speak("Swipe right to detect text, double tap to stop speech, tap to restart speech", TextToSpeech.QUEUE_ADD, null);
+                            tts.speak("Swipe right to detect text, double tap to stop speech, tap to restart speech. Swipe left to change Text to Speech Engine.", TextToSpeech.QUEUE_ADD, null);
                         } else {
                             Log.d("OnInitListener", "Error starting the text to speech engine.");
                         }
@@ -267,6 +267,8 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
 
                     textValue.setText(text);
                     tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+                    tts.speak("Click drop-down menu to translate text into other languages.", TextToSpeech.QUEUE_ADD, null);
+                    tts.speak("Swipe right to capture new text.", TextToSpeech.QUEUE_ADD, null);
                 } else {
                     statusMessage.setText(R.string.ocr_failure);
                     Log.d(TAG, "No Text captured, intent data is null");
@@ -284,21 +286,13 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                     ttsEngineName = data.getStringExtra(TTSEnginesActivity.TTSSelectedString);
                     Log.d("TTSListener", "EngineName: " + ttsEngineName.toString());
 
+                    tts = new TextToSpeech(this.getApplicationContext(), new TextToSpeech.OnInitListener() {
+                        public void onInit(int status) {
+                            tts.setLanguage(Locale.US);
+                            tts.speak("Swipe right to detect text, double tap to stop speech, tap to restart speech. Swipe left to change Text to Speech Engine.", TextToSpeech.QUEUE_ADD, null);
+                        }
+                    }, ttsEngineName);
 
-                    TextToSpeech.OnInitListener listener =
-                            new TextToSpeech.OnInitListener() {
-                                @Override
-                                public void onInit(final int status) {
-                                    if (status == TextToSpeech.SUCCESS) {
-                                        Log.d("OnInitListener", "Text to speech engine started successfully.");
-                                        tts.setLanguage(Locale.US);
-                                        tts.speak("Swipe right to detect text, double tap to stop speech, tap to restart speech", TextToSpeech.QUEUE_ADD, null);
-                                    } else {
-                                        Log.d("OnInitListener", "Error starting the text to speech engine.");
-                                    }
-                                }
-                            };
-                    tts = new TextToSpeech(this.getApplicationContext(), listener, ttsEngineName);
                     Log.d("TTSListener", "tts: " + tts);
                 }
             }
@@ -307,6 +301,11 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
 
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         languageSelected = languages.get(position);
+
+        tts.setLanguage(Locale.US);
+        tts.speak("Currently " + spLanguage.getItemAtPosition(position) + " selected.", TextToSpeech.QUEUE_ADD, null);
+        tts.speak("Click drop-down menu to change language.", TextToSpeech.QUEUE_ADD, null);
+        tts.speak("Press TRANSLATE to confirm your language selection.", TextToSpeech.QUEUE_ADD, null);
     }
 
     public void onNothingSelected(AdapterView<?> parent) {}
@@ -362,6 +361,8 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
 
         tts.setLanguage(new Locale(languageSelected));
         tts.speak(output, TextToSpeech.QUEUE_ADD, null);
+        tts.setLanguage(Locale.US);
+        tts.speak("Swipe right to capture new text.", TextToSpeech.QUEUE_ADD, null);
         outputText.clearComposingText();
     }
 
@@ -397,10 +398,13 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
             Intent intent = new Intent(this, OcrCaptureActivity.class);
             intent.putExtra(OcrCaptureActivity.AutoFocus, autoFocus.isChecked());
             intent.putExtra(OcrCaptureActivity.UseFlash, useFlash.isChecked());
+            intent.putExtra(ttsEngineName, ttsEngineName);
 
             text = "";
             outputText.clearComposingText();
             tts.setLanguage(Locale.US);
+
+            tts.stop();
 
             startActivityForResult(intent, RC_OCR_CAPTURE);
         } else if(event1.getX() > event2.getX()) {
@@ -409,6 +413,8 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
             Intent intent = new Intent(this, TTSEnginesActivity.class);
 
             ttsEngineName = "";
+
+            tts.stop();
 
             startActivityForResult(intent, RC_TTSENGINES);
 //            startActivity(intent);
