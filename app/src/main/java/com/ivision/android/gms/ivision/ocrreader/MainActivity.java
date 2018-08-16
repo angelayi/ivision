@@ -155,9 +155,28 @@ public class MainActivity extends Activity implements GestureDetector.OnGestureL
             @Override
             public void onClick(View v) {
                 if(text != null) {
+                    tts.stop();
+
                     ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                     clipboard.setText(text);
                     tts.speak("Text has been saved to clipboard.", TextToSpeech.QUEUE_ADD, null);
+                }
+            }
+        });
+
+        ImageButton shareButton = (ImageButton) findViewById(R.id.share);
+
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(text != null) {
+                    tts.stop();
+
+                    Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
+                    shareIntent.setType("text/plain");
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, text);
+                    startActivity(Intent.createChooser(shareIntent, "Share via"));
+                    tts.speak("Click where you would like to share the text.", TextToSpeech.QUEUE_ADD, null);
                 }
             }
         });
@@ -284,7 +303,7 @@ public class MainActivity extends Activity implements GestureDetector.OnGestureL
 
                     textValue.setText(text);
                     tts.speak(text, TextToSpeech.QUEUE_ADD, null);
-                    tts.speak("Click the button on the top right corner to copy to clipboard.", TextToSpeech.QUEUE_ADD, null);
+                    tts.speak("Click the button on the top right corner to copy to clipboard or to share.", TextToSpeech.QUEUE_ADD, null);
                     tts.speak("Click drop-down menu to translate text into other languages.", TextToSpeech.QUEUE_ADD, null);
                     tts.speak("Swipe right to capture new text.", TextToSpeech.QUEUE_ADD, null);
 
@@ -325,7 +344,7 @@ public class MainActivity extends Activity implements GestureDetector.OnGestureL
 
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         languageSelected = languages.get(position);
-
+        tts.stop();
         tts.setLanguage(Locale.US);
         tts.speak("Currently " + spLanguage.getItemAtPosition(position) + " selected.", TextToSpeech.QUEUE_ADD, null);
         tts.speak("Click drop-down menu to change language.", TextToSpeech.QUEUE_ADD, null);

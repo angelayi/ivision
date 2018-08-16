@@ -17,6 +17,16 @@
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"/>
 
+    <ImageButton
+        android:id="@+id/share"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@id/copy_to_clipboard"
+        android:src="@drawable/shareicon"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"/>
+
     <TextView
         android:id="@+id/status_message"
         android:layout_width="match_parent"
