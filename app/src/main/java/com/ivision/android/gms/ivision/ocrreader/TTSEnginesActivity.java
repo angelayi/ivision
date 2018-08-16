@@ -38,16 +38,20 @@ public class TTSEnginesActivity extends AppCompatActivity implements OnInitListe
     private int ttsSelected;
     private String selectedTTS;
     private String selectedTTSLabel;
+    private String ttsEngineLabel;
 
     private static final String DEBUG_TAG = "Gestures";
     private GestureDetectorCompat mDetector;
 
-    public static final String TTSSelectedString = "String";
+    public static final String TTSSelectedEngineName = "String";
+    public static final String TTSSelectedEngineLabel = "Strings";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tts_engines);
+
+        ttsEngineLabel = getIntent().getStringExtra(MainActivity.TTSEngineLabel);
 
         tts = new TextToSpeech(this, this);
         listInstalledEngines = tts.getEngines();
@@ -65,6 +69,11 @@ public class TTSEnginesActivity extends AppCompatActivity implements OnInitListe
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spInstalledEngines.setAdapter(adapter);
 
+        if(ttsEngineLabel != null) {
+            spInstalledEngines.setSelection(adapter.getPosition(ttsEngineLabel));
+            Log.d(TAG, "here " + ttsEngineLabel);
+        }
+
         mDetector = new GestureDetectorCompat(this,this);
         mDetector.setOnDoubleTapListener(this);
 
@@ -76,7 +85,8 @@ public class TTSEnginesActivity extends AppCompatActivity implements OnInitListe
                 Log.d(TAG, "Clicking: " + selectedTTS);
 
                 Intent data = new Intent();
-                data.putExtra(TTSSelectedString, selectedTTS);
+                data.putExtra(TTSSelectedEngineName, selectedTTS);
+                data.putExtra(TTSSelectedEngineLabel, selectedTTSLabel);
                 setResult(CommonStatusCodes.SUCCESS, data);
                 finish();
             }

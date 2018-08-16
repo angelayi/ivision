@@ -87,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
 
     public static final int RC_TTSENGINES = 1003;
     private String ttsEngineName;
+    private String ttsEngineLabel;
+    public static final String TTSEngineLabel = "Stringss";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,13 +137,12 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                 };
 //        tts = new TextToSpeech(this.getApplicationContext(), listener, ttsEngineName);
         tts = new TextToSpeech(this.getApplicationContext(), listener);
+        ttsEngineName = "";
 
         //findViewById(R.id.read_text).setOnClickListener(this);
 
         mDetector = new GestureDetectorCompat(this,this);
         mDetector.setOnDoubleTapListener(this);
-
-
 
         languages = new HashMap<Integer, String>();
         languages = createHash(languages);
@@ -291,8 +292,10 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         if (requestCode == RC_TTSENGINES) {
             if (resultCode == CommonStatusCodes.SUCCESS) {
                 if (data != null) {
-                    ttsEngineName = data.getStringExtra(TTSEnginesActivity.TTSSelectedString);
-                    Log.d("TTSListener", "EngineName: " + ttsEngineName.toString());
+                    ttsEngineName = data.getStringExtra(TTSEnginesActivity.TTSSelectedEngineName);
+                    ttsEngineLabel = data.getStringExtra(TTSEnginesActivity.TTSSelectedEngineLabel);
+                    Log.d("TTSListener", "EngineName: " + ttsEngineName);
+                    Log.d("TTSListener", "EngineLabel: " + ttsEngineLabel);
 
                     tts = new TextToSpeech(this.getApplicationContext(), new TextToSpeech.OnInitListener() {
                         public void onInit(int status) {
@@ -418,14 +421,16 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         } else if(event1.getX() > event2.getX()) {
             Log.d(DEBUG_TAG, "swipe left");
 
-            Intent intent = new Intent(this, TTSEnginesActivity.class);
+            if(ttsEngineLabel != null) {
+                Log.d(DEBUG_TAG, ttsEngineLabel);
+            }
 
-            ttsEngineName = "";
+            Intent intent = new Intent(this, TTSEnginesActivity.class);
+            intent.putExtra(TTSEngineLabel, ttsEngineLabel);
 
             tts.stop();
 
             startActivityForResult(intent, RC_TTSENGINES);
-//            startActivity(intent);
         }
         return true;
     }
