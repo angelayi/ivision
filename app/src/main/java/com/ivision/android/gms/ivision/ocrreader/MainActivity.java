@@ -43,6 +43,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -57,9 +58,10 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import static android.R.attr.data;
+import android.view.WindowManager;
 
 @TargetApi(14)
-public class MainActivity extends AppCompatActivity implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener, AdapterView.OnItemSelectedListener {
+public class MainActivity extends Activity implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener, AdapterView.OnItemSelectedListener {
     private static final String API_KEY = "";
 
     // Use a compound button so either checkbox or switch widgets work.
@@ -147,7 +149,18 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         languages = new HashMap<Integer, String>();
         languages = createHash(languages);
 
+        ImageButton copyButton = (ImageButton) findViewById(R.id.copy_to_clipboard);
 
+        copyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(text != null) {
+                    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    clipboard.setText(text);
+                    tts.speak("Text has been saved to clipboard.", TextToSpeech.QUEUE_ADD, null);
+                }
+            }
+        });
     }
 
     public HashMap<Integer, String> createHash(HashMap<Integer,String> languages) {
@@ -271,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
 
                     textValue.setText(text);
                     tts.speak(text, TextToSpeech.QUEUE_ADD, null);
-                    tts.speak("Text has been saved to clipboard.", TextToSpeech.QUEUE_ADD, null);
+                    tts.speak("Click the button on the top right corner to copy to clipboard.", TextToSpeech.QUEUE_ADD, null);
                     tts.speak("Click drop-down menu to translate text into other languages.", TextToSpeech.QUEUE_ADD, null);
                     tts.speak("Swipe right to capture new text.", TextToSpeech.QUEUE_ADD, null);
 
